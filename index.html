@@ -99,7 +99,7 @@ body {
 .btn-pause { background: rgba(255,255,255,0.15); color: white; border: 1.5px solid rgba(255,255,255,0.3); }
 .btn-done { background: rgba(86,171,47,0.3); color: white; border: 1.5px solid rgba(86,171,47,0.5); }
 .btn-delete { background: rgba(255,80,80,0.2); color: rgba(255,180,180,0.9); border: 1.5px solid rgba(255,100,100,0.35); }
-.btn-pinyin { font-size: 15px; display: block; font-weight: 600; }
+.btn-pinyin { font-size: 15px; display: block; font-weight: 600; color: rgba(255,255,255,0.85); }
 .btn-done .btn-pinyin, .btn-start .btn-pinyin { color: rgba(26,26,46,0.5); }
 .btn-pause .btn-pinyin { color: rgba(255,255,255,0.5); }
 .progress-bar-wrap { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.1); border-radius: 0 0 20px 20px; overflow: hidden; }
@@ -221,7 +221,7 @@ body {
       <div class="app-title">小猕猴桃脑袋星</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:24px;margin:6px 0 4px;width:100%;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <div class="app-pinyin">xiǎo mí hóu táo nǎo dài xīng</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v5.1</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v5.3</div>
     </div>
     <div class="screen-time-badge" onclick="openParent()">
       <div class="screen-time-num" id="screenTimeNum">0</div>
@@ -582,11 +582,11 @@ function buildTaskCard(task) {
       <div class="task-info">
         <div class="task-name">${task.name}</div>
         ${timeTags?`<div class="task-time-tags">${timeTags}</div>`:''}
-        <div style="display:flex;justify-content:flex-end;align-items:baseline;gap:8px;margin-top:8px">
-          <span style="font-size:15px;font-weight:400;color:rgba(255,255,255,0.6)">实际用时</span>
-          <span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.5)">shí jì yòng shí</span>
-          <span id="elapsed-${task.id}" style="font-size:26px;font-weight:900;color:${task.running?'#FFD166':'rgba(255,255,255,0.8)'};letter-spacing:1px">${formatTime(elapsed)}</span>
-        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;min-width:72px;margin-left:8px">
+        <span style="font-size:9px;font-weight:400;color:rgba(255,255,255,0.6);white-space:nowrap">实际用时</span>
+        <span style="font-size:9px;color:rgba(255,255,255,0.5);white-space:nowrap">shí jì yòng shí</span>
+        <span id="elapsed-${task.id}" style="font-size:24px;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 2px 8px rgba(0,0,0,0.9);margin-top:2px">${formatTime(elapsed)}</span>
       </div>
     </div>
     ${task.running?`<div class="timer-display" id="timer-${task.id}">${formatTime(elapsed)}</div>`:''}
@@ -598,7 +598,7 @@ function buildTaskCard(task) {
       ${!task.started?`<button class="btn-task btn-pause" onclick="editTask('${task.id}')"><span>✏️ 修改</span><span class="btn-pinyin">xiū gǎi</span></button>`:''}
       <button class="btn-task btn-delete" style="flex:1" onclick="deleteTask('${task.id}')"><span>🗑 删除</span><span class="btn-pinyin">shān chú</span></button>
     </div>`:`<div style="margin-top:10px;font-size:13px;color:rgba(255,255,255,0.4)">✓ 已完成 · 用时 ${formatTime(elapsed)}</div>`}
-    ${task.running&&estMins>0?`<div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-${task.id}" style="width:${progress}%"></div></div>`:''}
+    
   `;
   if(task.running) startInterval(task.id);
   return card;
@@ -621,7 +621,7 @@ function startInterval(id) {
     saveDB();
     const elEl=document.getElementById('elapsed-'+id);
     const progEl=document.getElementById('prog-'+id);
-    if(elEl) { elEl.textContent=formatTime(task.elapsed); elEl.style.color='#FFD166'; elEl.style.fontWeight='900'; elEl.style.fontSize='26px'; }
+    if(elEl) { elEl.textContent=formatTime(task.elapsed); elEl.style.color='#fff'; elEl.style.fontWeight='900'; elEl.style.fontSize='28px'; elEl.style.textShadow='0 2px 8px rgba(0,0,0,0.8)'; }
     if(progEl&&task.estimatedMin) {
       progEl.style.width=Math.min(100,(task.elapsed/60/task.estimatedMin)*100)+'%';
     }
