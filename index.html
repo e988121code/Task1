@@ -81,7 +81,7 @@ body {
 .task-name { font-size: 26px; font-weight: 800; line-height: 1.2; word-break: break-all; }
 .task-card.done-card .task-name { text-decoration: line-through; opacity: 0.6; }
 .task-pinyin { font-size: 18px; color: var(--pinyin); letter-spacing: 1px; margin-top: 3px; }
-.task-time-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.task-time-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .time-tag {
   font-size: 16px; padding: 3px 10px; border-radius: 20px;
   background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
@@ -99,10 +99,10 @@ body {
   transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .btn-task:active { transform: scale(0.95); }
-.btn-start { background: linear-gradient(135deg,#FFD166,#FF6B35); color: #1a1a2e; box-shadow: 0 4px 16px rgba(255,107,53,0.4); }
-.btn-pause { background: rgba(255,255,255,0.2); color: white; border: 1.5px solid rgba(255,255,255,0.35); }
-.btn-done { background: linear-gradient(135deg,#56ab2f,#a8e063); color: #1a1a2e; box-shadow: 0 4px 16px rgba(86,171,47,0.4); }
-.btn-delete { flex: 0; padding: 12px 14px; background: rgba(255,80,80,0.2); color: rgba(255,150,150,0.9); border: 1.5px solid rgba(255,100,100,0.3); }
+.btn-start { background: rgba(255,209,102,0.25); color: white; border: 1.5px solid rgba(255,209,102,0.5); }
+.btn-pause { background: rgba(255,255,255,0.15); color: white; border: 1.5px solid rgba(255,255,255,0.3); }
+.btn-done { background: rgba(86,171,47,0.3); color: white; border: 1.5px solid rgba(86,171,47,0.5); }
+.btn-delete { background: rgba(255,80,80,0.2); color: rgba(255,180,180,0.9); border: 1.5px solid rgba(255,100,100,0.35); }
 .btn-pinyin { font-size: 13px; display: block; font-weight: 500; }
 .btn-done .btn-pinyin, .btn-start .btn-pinyin { color: rgba(26,26,46,0.5); }
 .btn-pause .btn-pinyin { color: rgba(255,255,255,0.5); }
@@ -225,7 +225,7 @@ body {
       <div class="app-title">小猕猴桃脑袋星</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:24px;margin:6px 0 4px;width:100%;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <div class="app-pinyin">xiǎo mí hú táo nǎo dài xīng</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v3.6</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v3.8</div>
     </div>
     <div class="screen-time-badge" onclick="openParent()">
       <div class="screen-time-num" id="screenTimeNum">0</div>
@@ -584,7 +584,6 @@ function buildTaskCard(task) {
       <div class="task-emoji">${task.emoji||'⭐'}</div>
       <div class="task-info">
         <div class="task-name">${task.name}</div>
-        <div class="task-pinyin">${pinyin||'&nbsp;'}</div>
         ${timeTags?`<div class="task-time-tags">${timeTags}</div>`:''}
         <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px">实际用时 <span style="font-size:11px;opacity:0.7">shí jì yòng shí</span> <span id="elapsed-${task.id}">${formatTime(elapsed)}</span></div>
       </div>
@@ -596,7 +595,7 @@ function buildTaskCard(task) {
       ${task.running?`<button class="btn-task btn-pause" onclick="pauseTask('${task.id}')"><span>⏸ 暂停</span><span class="btn-pinyin">zàn tíng</span></button>`:''}
       ${task.started?`<button class="btn-task btn-done" onclick="doneTask('${task.id}')"><span>✓ 完成</span><span class="btn-pinyin">wán chéng</span></button>`:''}
       ${!task.started?`<button class="btn-task btn-pause" onclick="editTask('${task.id}')"><span>✏️ 修改</span><span class="btn-pinyin">xiū gǎi</span></button>`:''}
-      <button class="btn-task btn-delete" onclick="deleteTask('${task.id}')"><span>🗑 删除</span><span class="btn-pinyin">shān chú</span></button>
+      <button class="btn-task btn-delete" style="flex:1" onclick="deleteTask('${task.id}')"><span>🗑 删除</span><span class="btn-pinyin">shān chú</span></button>
     </div>`:`<div style="margin-top:10px;font-size:13px;color:rgba(255,255,255,0.4)">✓ 已完成 · 用时 ${formatTime(elapsed)}</div>`}
     ${task.running&&estMins>0?`<div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-${task.id}" style="width:${progress}%"></div></div>`:''}
   `;
@@ -791,7 +790,7 @@ let _pendingChallenge=false;
 
 function openAddModal() {
   document.getElementById('addModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
   document.getElementById('taskNameInput').value='';
   document.getElementById('startTimeInput').value='';
   document.getElementById('endTimeInput').value='';
@@ -804,7 +803,9 @@ function openAddModal() {
 
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
+  // Check if any modal still open before unlocking
+  const anyOpen = ['addModal','parentModal','doneModal','rescheduleModal'].some(m=>document.getElementById(m)&&document.getElementById(m).classList.contains('open'));
+  if(!anyOpen) unlockBodyScroll();
   if(id==='addModal'){ stopVoice(); editingTaskId=null; document.querySelector('.modal-title').textContent='添加任务'; document.querySelector('.btn-confirm').innerHTML='好了，发射！🚀<span style="display:block;font-size:20px;font-weight:700;opacity:0.9;margin-top:6px;letter-spacing:2px">hǎo le, fā shè</span>'; }
 }
 function closeModalIfBackdrop(e,id) { if(e.target.classList.contains('modal-backdrop')) closeModal(id); }
@@ -1167,7 +1168,7 @@ let pinBuffer='', pinMode='enter', pinTemp='', parentUnlocked=false;
 
 function openParent() {
   document.getElementById('parentModal').classList.add('open');
-  document.body.style.overflow='hidden';
+  lockBodyScroll();
   parentUnlocked=false;
   document.getElementById('parentContent').classList.remove('visible');
   document.getElementById('pinArea').style.display='block';
@@ -1235,7 +1236,7 @@ function showParentContent() {
     </div>`;}).join('');}
 }
 
-function lockParent(){parentUnlocked=false;closeModal('parentModal');document.body.style.overflow='';}
+function lockParent(){parentUnlocked=false;closeModal('parentModal');}
 
 // ===== IN-APP ALARM POLLING =====
 // Checks every 30s for upcoming tasks (5min warning)
@@ -1324,7 +1325,7 @@ function editTask(id) {
 
 // ===== COMPLETED TASKS LIST =====
 function openDoneList() {
-  document.body.style.overflow='hidden';
+  lockBodyScroll();
   const body = document.getElementById('doneListBody');
   const doneTasks = db.tasks.filter(t=>t.done);
   if(doneTasks.length===0){
@@ -1363,6 +1364,26 @@ function handleBackdropTouch(e, id) {
     closeModal(id);
   }
 }
+
+// ===== BODY SCROLL LOCK =====
+function preventScroll(e) {
+  // Allow scroll inside modal sheets
+  const sheet = e.target.closest('.modal-sheet, .parent-modal, .reschedule-modal');
+  if(sheet) {
+    // Allow vertical scroll within sheet
+    return;
+  }
+  e.preventDefault();
+}
+
+function lockBodyScroll() {
+  document.addEventListener('touchmove', preventScroll, { passive: false });
+}
+
+function unlockBodyScroll() {
+  document.removeEventListener('touchmove', preventScroll);
+}
+
 // ===== INIT =====
 loadDB(); createStars(); renderTasks(); renderNotifBanner();
 db.tasks.filter(t=>t.running).forEach(t=>startInterval(t.id));
