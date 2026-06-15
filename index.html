@@ -404,7 +404,7 @@ body {
 </div>
 
 <div class="toast-msg" id="toastMsg"></div>
-<div style="position:fixed;bottom:16px;left:16px;font-size:13px;font-weight:800;color:#fff;z-index:9999;text-shadow:0 2px 6px rgba(0,0,0,0.9)">v9.3</div>
+<div style="position:fixed;bottom:16px;left:16px;font-size:13px;font-weight:800;color:#fff;z-index:9999;text-shadow:0 2px 6px rgba(0,0,0,0.9)">v9.4</div>
 
 <script>
 // ===== DATA =====
@@ -1350,7 +1350,7 @@ function openDoneList() {
   const body = document.getElementById('doneListBody');
   const doneTasks = db.tasks.filter(t=>t.done);
   if(doneTasks.length===0){
-    body.innerHTML='<div style="text-align:center;padding:32px;color:rgba(255,255,255,0.5);font-size:18px">还没有完成的任务<br><span style="font-size:14px;letter-spacing:2px">hái méi yǒu wán chéng de rèn wù</span></div>';
+    body.innerHTML='<div style="text-align:center;padding:32px;color:rgba(255,255,255,0.5);font-size:18px">还没有已完成的任务<br><span style="font-size:14px;letter-spacing:2px">hái méi yǒu yǐ wán chéng de rèn wù</span></div>';
   } else {
     // Group by date
     const byDate = {};
