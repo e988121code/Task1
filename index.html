@@ -225,7 +225,7 @@ body {
       <div class="app-title">小猕猴桃脑袋星</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:24px;margin:6px 0 4px;width:100%;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <div class="app-pinyin">xiǎo mí hú táo nǎo dài xīng</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v3.5</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v3.6</div>
     </div>
     <div class="screen-time-badge" onclick="openParent()">
       <div class="screen-time-num" id="screenTimeNum">0</div>
@@ -834,18 +834,16 @@ function computeThirdField() {
     const diff=eMins-sMins;
     if(diff>0){
       dEl.value=diff;
-      computed.style.display='block';
-      computed.textContent='⚡ 时长：'+diff+' 分钟';
+      computed.style.display='none';
     } else {
-      computed.style.display='block';
-      computed.textContent='⚠️ 结束时间早于开始时间';
+      computed.style.display='none';
     }
   } else if(s&&dMins) {
     const end=minsToTime(sMins+dMins);
-    eEl.value=end;computed.style.display='block';computed.textContent='⚡ 结束时间：'+end;
+    eEl.value=end;computed.style.display='none';
   } else if(e&&dMins) {
     const start=minsToTime(eMins-dMins);
-    sEl.value=start;computed.style.display='block';computed.textContent='⚡ 开始时间：'+start;
+    sEl.value=start;computed.style.display='none';
   } else { computed.style.display='none'; }
 
   const name=document.getElementById('taskNameInput').value.trim();
@@ -1069,9 +1067,10 @@ function addTask() {
   };
   _pendingChallenge=false;
   db.tasks.push(task); saveDB();
-  scheduleTaskNotifications(task);
   closeModal('addModal'); renderTasks();
   showToast('🌟 任务添加成功！加油！');
+  // Schedule notifications AFTER modal closes and task is saved
+  setTimeout(()=>scheduleTaskNotifications(task), 500);
 }
 
 // ===== ALL DONE CHECK =====
@@ -1168,6 +1167,7 @@ let pinBuffer='', pinMode='enter', pinTemp='', parentUnlocked=false;
 
 function openParent() {
   document.getElementById('parentModal').classList.add('open');
+  document.body.style.overflow='hidden';
   parentUnlocked=false;
   document.getElementById('parentContent').classList.remove('visible');
   document.getElementById('pinArea').style.display='block';
@@ -1235,13 +1235,15 @@ function showParentContent() {
     </div>`;}).join('');}
 }
 
-function lockParent(){parentUnlocked=false;closeModal('parentModal');}
+function lockParent(){parentUnlocked=false;closeModal('parentModal');document.body.style.overflow='';}
 
 // ===== IN-APP ALARM POLLING =====
 // Checks every 30s for upcoming tasks (5min warning)
 const _notifiedPre=new Set(), _notifiedEnd=new Set();
 function pollAlarms() {
   const now=Date.now();
+  // Only poll tasks that have been saved (createdAt exists) and not currently being added
+  if(document.getElementById('addModal').classList.contains('open')) return;
   db.tasks.filter(t=>isToday(t.createdAt)&&!t.done).forEach(task=>{
     if(task.startTime) {
       const startMs=timeStrToTodayMs(task.startTime);
@@ -1322,6 +1324,7 @@ function editTask(id) {
 
 // ===== COMPLETED TASKS LIST =====
 function openDoneList() {
+  document.body.style.overflow='hidden';
   const body = document.getElementById('doneListBody');
   const doneTasks = db.tasks.filter(t=>t.done);
   if(doneTasks.length===0){
