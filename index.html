@@ -224,7 +224,7 @@ body {
       <div class="app-title">小猕猴桃脑袋星</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:24px;margin:6px 0 4px;width:100%"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <div class="app-pinyin">xiǎo mí hú táo nǎo dài xīng</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">v1.8</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">v2.0</div>
     </div>
     <div class="screen-time-badge" onclick="openParent()">
       <div class="screen-time-num" id="screenTimeNum">0</div>
@@ -887,33 +887,62 @@ function startVoice() {
 }
 
 function parseVoiceInput(t) {
-  // Time parsing: "三点到四点" / "3点到4点" / "三点半到四点"
+  showToast('识别：' + t);
   const chMap={'零':0,'一':1,'两':2,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'十二':12};
   function parseHour(s) {
+    if(!s) return null;
     if(/^\d+$/.test(s)) return parseInt(s);
     return chMap[s]!==undefined ? chMap[s] : null;
   }
-  // Match patterns like 三点到四点, 3点到4点半, 下午三点到四点
-  const rangeRe=/([零一两二三四五六七八九十]+|\d+)点(半|(\d+)分)?[到至-]([零一两二三四五六七八九十]+|\d+)点(半|(\d+)分)?/;
-  const rm=t.match(rangeRe);
-  if(rm) {
-    const sh=parseHour(rm[1]); const sm2=rm[2]==='半'?30:(rm[3]?parseInt(rm[3]):0);
-    const eh=parseHour(rm[4]); const em2=rm[5]==='半'?30:(rm[6]?parseInt(rm[6]):0);
-    if(sh!==null&&eh!==null) {
-      document.getElementById('startTimeInput').value=minsToTime(sh*60+sm2);
-      document.getElementById('endTimeInput').value=minsToTime(eh*60+em2);
+  function parseMins(s) {
+    if(!s) return 0;
+    if(s==='半') return 30;
+    return parseInt(s)||0;
+  }
+  let startMins=null, endMins=null;
+  let nameStr = t;
+
+  // Pattern 1: "7:05到7:10" or "7：05到7：10" (with full-width or half-width colon)
+  const colonRe = /(\d{1,2})[:：](\d{2})[到至\-](\d{1,2})[:：](\d{2})/;
+  const cr = t.match(colonRe);
+  if(cr) {
+    startMins = parseInt(cr[1])*60 + parseInt(cr[2]);
+    endMins   = parseInt(cr[3])*60 + parseInt(cr[4]);
+    nameStr = nameStr.replace(cr[0], '');
+  }
+
+  // Pattern 2: "三点到四点" / "3点半到4点"
+  if(startMins===null) {
+    const chRe = /([零一两二三四五六七八九十]{1,3}|\d{1,2})点(半|\d{1,2}分)?[到至\-]([零一两二三四五六七八九十]{1,3}|\d{1,2})点(半|\d{1,2}分)?/;
+    const cm = t.match(chRe);
+    if(cm) {
+      const sh=parseHour(cm[1]), sm2=parseMins(cm[2]);
+      const eh=parseHour(cm[3]), em2=parseMins(cm[4]);
+      if(sh!==null&&eh!==null){ startMins=sh*60+sm2; endMins=eh*60+em2; }
+      nameStr = nameStr.replace(cm[0], '');
     }
   }
-  // Duration: "20分钟"
-  const durRe=/(\d+)\s*分钟/;
-  const dm=t.match(durRe);
-  if(dm) document.getElementById('taskTimeInput').value=dm[1];
-  // Strip time info from task name
-  let name=t.replace(rangeRe,'').replace(durRe,'').replace(/[做完成]+$/,'').trim();
-  // Remove leading verbs
-  name=name.replace(/^(做|完成|去|来)/,'').trim();
-  if(name) document.getElementById('taskNameInput').value=name;
-  computeThirdField();
+
+  // Duration
+  const durRe = /(\d+)\s*分钟/;
+  const dm = t.match(durRe);
+  if(dm) { document.getElementById('taskTimeInput').value=dm[1]; nameStr=nameStr.replace(dm[0],''); }
+
+  if(startMins!==null) document.getElementById('startTimeInput').value = minsToTime(startMins);
+  if(endMins!==null)   document.getElementById('endTimeInput').value   = minsToTime(endMins);
+
+  // Clean task name
+  nameStr = nameStr.replace(/(今天|明天|上午|下午|早上|晚上)/g,'');
+  nameStr = nameStr.replace(/^(做|完成|去|来|要|我|帮我)+/,'');
+  nameStr = nameStr.replace(/[，。！？、.,\s]/g,'').trim();
+
+  if(nameStr) {
+    document.getElementById('taskNameInput').value = nameStr;
+    autoMatchEmoji(nameStr);
+  }
+
+  showToast('任务:'+nameStr+' 开始:'+(startMins!==null?minsToTime(startMins):'无'));
+  setTimeout(()=>computeThirdField(), 150);
 }
 
 function stopVoice() {
