@@ -34,7 +34,7 @@ body {
 .header { padding: 28px 24px 16px; display: flex; align-items: flex-start; justify-content: space-between; width: 100%; max-width: 780px; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 10; pointer-events: none; }
 .app-title { font-size: 42px; font-weight: 900; width: 100%; text-align: justify; text-align-last: justify; line-height: 1; margin-bottom: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.7); text-shadow: 0 2px 8px rgba(0,0,0,0.6); letter-spacing: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5); }
 .app-pinyin { font-size: 20px; font-weight: 800; color: #fff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 20px rgba(0,0,0,0.7); letter-spacing: 2px; line-height: 1; margin-top: 2px; letter-spacing: 3px; color: var(--pinyin); margin-top: 2px; }
-.screen-time-badge { pointer-events: auto;
+.screen-time-badge { pointer-events: auto; display: flex; flex-direction: column; justify-content: space-between;
   background: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.4);
   border-radius: 20px; padding: 8px 16px; text-align: center;
   backdrop-filter: blur(8px); cursor: pointer; transition: background 0.2s;
@@ -85,7 +85,7 @@ body {
 .time-tag {
   font-size: 18px; padding: 5px 12px; border-radius: 20px;
   background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-  color: var(--sunset3); display: inline-flex; align-items: center; height: 32px;
+  color: #fff; display: inline-flex; align-items: center; height: 32px;
 }
 
 .task-actions { display: flex; gap: 10px; margin-top: 14px; }
@@ -388,10 +388,10 @@ body {
 
 
 <!-- Completed Tasks Modal -->
-<div class="modal-backdrop" id="doneModal">
+<div class="modal-backdrop" id="doneModal" onclick="closeModalIfBackdrop(event,'doneModal')">
   <div class="modal-sheet" style="max-height:80dvh">
     <button class="close-btn" onclick="closeModal('doneModal')">×</button>
-    <div class="modal-title">已完成任务 ✓</div>
+    <div class="modal-title">已完成任务</div>
     <div class="modal-pinyin">yǐ wán chéng rèn wù</div>
     <div id="doneListBody"></div>
   </div>
@@ -573,7 +573,7 @@ function buildTaskCard(task) {
   if(task.startTime && task.endTime) timeTags+=`<span class="time-tag">${task.startTime} - ${task.endTime}</span>`;
   else if(task.startTime) timeTags+=`<span class="time-tag">${task.startTime}</span>`;
   else if(task.endTime) timeTags+=`<span class="time-tag">${task.endTime}</span>`;
-  if(task.estimatedMin) timeTags+=`<span class="time-tag">${task.estimatedMin}分钟</span>`;
+  if(task.estimatedMin) timeTags+=`<span class="time-tag">共${task.estimatedMin}分钟</span>`;
 
   card.innerHTML=`
     ${isOverdue?'<div class="overdue-badge">⚠️ 已错过开始时间！/ yǐ cuò guò</div>':''}
@@ -586,7 +586,7 @@ function buildTaskCard(task) {
       <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;min-width:80px;margin-left:8px">
         <span style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);white-space:nowrap">实际用时</span>
         <span style="font-size:13px;color:rgba(255,255,255,0.75);white-space:nowrap">shí jì yòng shí</span>
-        <span id="elapsed-${task.id}" style="font-size:32px;font-weight:900;color:#fff;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,0.95);margin-top:4px">${formatTime(elapsed)}</span>
+        <span id="elapsed-${task.id}" style="font-size:24px;font-weight:900;color:#fff;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,0.95);margin-top:4px">${formatTime(elapsed)}</span>
       </div>
     </div>
 
@@ -1337,7 +1337,7 @@ function openDoneList() {
     });
     body.innerHTML = Object.entries(byDate).reverse().map(([date,tasks])=>`
       <div style="margin-bottom:18px">
-        <div style="font-size:13px;letter-spacing:2px;color:rgba(255,255,255,0.5);margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:6px">${date}</div>
+        
         ${tasks.map(t=>`
           <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(86,171,47,0.15);border:1px solid rgba(86,171,47,0.3);border-radius:14px;margin-bottom:8px">
             <span style="font-size:28px">${t.emoji||'⭐'}</span>
@@ -1428,6 +1428,5 @@ function scheduleNotificationViaSW(title, body, delayMs) {
   }
 }
 <\/script>
-<div style="position:fixed;bottom:8px;right:8px;font-size:11px;color:rgba(255,255,255,0.3);z-index:1;pointer-events:none">v6.3</div>
 </body>
 </html>
