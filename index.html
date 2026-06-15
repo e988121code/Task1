@@ -30,7 +30,7 @@ body {
 .star { position: absolute; width: 3px; height: 3px; background: white; border-radius: 50%; animation: twinkle 3s infinite alternate; }
 @keyframes twinkle { 0%{opacity:0.2;transform:scale(1)} 100%{opacity:1;transform:scale(1.4)} }
 
-.app { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 120px 0 120px; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; height: 100dvh; -webkit-overflow-scrolling: touch; }
+.app { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 170px 0 40px; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; height: 100dvh; -webkit-overflow-scrolling: touch; }
 .header { padding: 28px 24px 16px; display: flex; align-items: flex-start; justify-content: space-between; width: 100%; max-width: 780px; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 10; pointer-events: none; }
 .app-title { font-size: 42px; font-weight: 900; width: 100%; text-align: justify; text-align-last: justify; text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.7); text-shadow: 0 2px 8px rgba(0,0,0,0.6); letter-spacing: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5); }
 .app-pinyin { font-size: 22px; font-weight: 800; color: #fff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 20px rgba(0,0,0,0.7); letter-spacing: 2px; letter-spacing: 3px; color: var(--pinyin); margin-top: 2px; }
@@ -43,7 +43,7 @@ body {
 .screen-time-num { font-size: 34px; font-weight: 900; color: white; text-shadow: 0 0 16px rgba(255,209,102,0.9), 0 2px 8px rgba(0,0,0,0.8); }
 .screen-time-label { font-size: 17px; font-weight: 800; color: #fff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.95); color: var(--pinyin); letter-spacing: 1px; margin-top: 2px; }
 .screen-time-pinyin { font-size: 15px; color: #fff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.95); color: var(--pinyin); letter-spacing: 1px; }
-.tasks-area { padding: 0 16px; display: flex; flex-direction: column; overflow-x: hidden; touch-action: pan-y; }
+.tasks-area { padding: 0 100px 0 16px; display: flex; flex-direction: column; overflow-x: hidden; touch-action: pan-y; }
 .task-card {
   background: rgba(0,0,0,0.38); border: 1.5px solid rgba(255,255,255,0.3);
   border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
@@ -182,38 +182,6 @@ body {
 .toast-msg { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(26,26,46,0.95); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 14px 28px; font-size: 18px; font-weight: 700; white-space: nowrap; opacity: 0; transition: all 0.3s; z-index: 300; pointer-events: none; }
 .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .close-btn { position: absolute; top: 12px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: white; font-size: 28px; cursor: pointer; line-height: 1; width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; }
-
-.task-card-inner { display: flex; gap: 12px; align-items: stretch; }
-.task-left { flex: 1; min-width: 0; }
-.task-actions-side {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 100px;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.btn-side {
-  padding: 10px 8px;
-  border: none;
-  border-radius: 14px;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white !important;
-  min-height: 54px;
-}
-.btn-side:active { transform: scale(0.95); }
-.btn-side.btn-start { background: rgba(255,209,102,0.25); border: 1.5px solid rgba(255,209,102,0.5); }
-.btn-side.btn-pause { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); }
-.btn-side.btn-done { background: rgba(86,171,47,0.3); border: 1.5px solid rgba(86,171,47,0.5); }
-.btn-side.btn-delete { background: rgba(255,80,80,0.2); border: 1.5px solid rgba(255,100,100,0.35); }
 /* Reschedule modal */
 .reschedule-modal { background: rgba(120, 50, 10, 0.40); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 28px 28px 0 0; padding: 28px 24px 48px; width: 100%; max-width: 780px; animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 90dvh; overflow-y: auto; }
 .affected-task-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
@@ -253,7 +221,7 @@ body {
       <div class="app-title">小猕猴桃脑袋星</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:24px;margin:6px 0 4px;width:100%;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <div class="app-pinyin">xiǎo mí hóu táo nǎo dài xīng</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v6.1</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v6.2</div>
     </div>
     <div class="screen-time-badge" onclick="openParent()">
       <div class="screen-time-num" id="screenTimeNum">0</div>
