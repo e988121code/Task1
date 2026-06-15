@@ -34,7 +34,7 @@ body {
 .header { padding: 28px 24px 16px; display: flex; align-items: flex-start; justify-content: space-between; width: 100%; max-width: 780px; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 10; pointer-events: none; }
 .app-title { font-size: 42px; font-weight: 900; width: 100%; text-align: justify; text-align-last: justify; line-height: 1; margin-bottom: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.7); text-shadow: 0 2px 8px rgba(0,0,0,0.6); letter-spacing: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5); }
 .app-pinyin { font-size: 20px; font-weight: 800; color: #fff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 20px rgba(0,0,0,0.7); letter-spacing: 2px; line-height: 1; margin-top: 2px; letter-spacing: 3px; color: var(--pinyin); margin-top: 2px; }
-.screen-time-badge { pointer-events: auto; display: flex; flex-direction: column; justify-content: space-between;
+.screen-time-badge { pointer-events: auto; display: flex; flex-direction: column; justify-content: space-between; align-self: stretch;
   background: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.4);
   border-radius: 20px; padding: 8px 16px; text-align: center;
   backdrop-filter: blur(8px); cursor: pointer; transition: background 0.2s;
@@ -254,6 +254,7 @@ body {
     <button class="fab" onclick="openAddModal()" style="background:rgba(255,209,102,0.35);border:1.5px solid rgba(255,209,102,0.6);color:white;font-size:36px;">＋</button>
     <span style="font-size:15px;font-weight:800;color:white;text-shadow: 0 2px 6px rgba(0,0,0,0.9)">添加</span>
     <span style="font-size:16px;font-weight:700;color:#fff;text-shadow: 0 2px 6px rgba(0,0,0,0.9);white-space:nowrap">tiān jiā</span>
+    <span style="font-size:13px;font-weight:800;color:#fff;margin-top:150px;text-shadow:0 2px 6px rgba(0,0,0,0.9)">v7.5</span>
   </div>
 </div>
 
@@ -389,7 +390,7 @@ body {
 
 <!-- Completed Tasks Modal -->
 <div class="modal-backdrop" id="doneModal">
-  <div class="modal-sheet" style="max-height:80dvh">
+  <div class="modal-sheet">
     <button class="close-btn" onclick="closeModal('doneModal')">×</button>
     <div class="modal-title">已完成任务</div>
     <div class="modal-pinyin">yǐ wán chéng rèn wù</div>
