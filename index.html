@@ -225,7 +225,7 @@ body {
       <div class="app-title">小猕猴桃脑袋星</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:24px;margin:6px 0 4px;width:100%;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <div class="app-pinyin">xiǎo mí hú táo nǎo dài xīng</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v2.9</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v3.0</div>
     </div>
     <div class="screen-time-badge" onclick="openParent()">
       <div class="screen-time-num" id="screenTimeNum">0</div>
@@ -1029,19 +1029,19 @@ function addTask() {
     const endBeforeStart = sMins!==null && eMins!==null && eMins <= sMins;
 
     if(endBeforeStart) {
-      showAlert('⚠️','请重新设置结束时间','qǐng chóng xīn shè zhì jié shù shí jiān 结束时间不能早于开始时间！');
+      showAlert('⚠️','请重新设置结束时间','qǐng chóng xīn shè zhì jié shù shí jiān<br>结束时间不能早于开始时间！<br><span style="font-size:13px;opacity:0.8">jié shù shí jiān bù néng zǎo yú kāi shǐ shí jiān</span>');
       return;
     }
     if(startPast && endPast) {
-      showAlert('⚠️','请重新设置开始和结束时间','qǐng chóng xīn shè zhì kāi shǐ hé jié shù shí jiān 两个时间都已经过了哦！');
+      showAlert('⚠️','请重新设置开始和结束时间','qǐng chóng xīn shè zhì kāi shǐ hé jié shù shí jiān<br>两个时间都已经过了哦！<br><span style="font-size:13px;opacity:0.8">liǎng gè shí jiān dōu yǐ jīng guò le o</span>');
       return;
     }
     if(startPast) {
-      showAlert('⚠️','请重新设置开始时间','qǐng chóng xīn shè zhì kāi shǐ shí jiān 开始时间已经过了哦！');
+      showAlert('⚠️','请重新设置开始时间','qǐng chóng xīn shè zhì kāi shǐ shí jiān<br>开始时间已经过了哦！<br><span style="font-size:13px;opacity:0.8">kāi shǐ shí jiān yǐ jīng guò le o</span>');
       return;
     }
     if(endPast) {
-      showAlert('⚠️','请重新设置结束时间','qǐng chóng xīn shè zhì jié shù shí jiān 结束时间已经过了哦！');
+      showAlert('⚠️','请重新设置结束时间','qǐng chóng xīn shè zhì jié shù shí jiān<br>结束时间已经过了哦！<br><span style="font-size:13px;opacity:0.8">jié shù shí jiān yǐ jīng guò le o</span>');
       return;
     }
   }
