@@ -34,7 +34,7 @@ body {
 .header { padding: 28px 24px 16px; display: flex; align-items: flex-start; justify-content: space-between; width: 100%; max-width: 780px; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 10; pointer-events: none; }
 .app-title { font-size: 42px; font-weight: 900; width: 100%; text-align: justify; text-align-last: justify; line-height: 1; margin-bottom: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.7); text-shadow: 0 2px 8px rgba(0,0,0,0.6); letter-spacing: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5); }
 .app-pinyin { font-size: 20px; font-weight: 800; color: #fff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 20px rgba(0,0,0,0.7); letter-spacing: 2px; line-height: 1; margin-top: 2px; letter-spacing: 3px; color: var(--pinyin); margin-top: 2px; }
-.screen-time-badge { pointer-events: auto; display: flex; flex-direction: column; justify-content: space-between; align-self: stretch;
+.screen-time-badge { pointer-events: auto; display: flex; flex-direction: column; justify-content: center; align-self: stretch;
   background: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.4);
   border-radius: 20px; padding: 8px 16px; text-align: center;
   backdrop-filter: blur(8px); cursor: pointer; transition: background 0.2s;
@@ -393,7 +393,7 @@ body {
     <button class="close-btn" onclick="closeModal('doneModal')">×</button>
     <div class="modal-title">已完成任务</div>
     <div class="modal-pinyin">yǐ wán chéng rèn wù</div>
-    <div id="doneListBody"></div>
+    <div id="doneListBody" style="min-height:60dvh"></div>
   </div>
 </div>
 <!-- Celebration -->
@@ -404,7 +404,7 @@ body {
 </div>
 
 <div class="toast-msg" id="toastMsg"></div>
-<div style="position:fixed;bottom:16px;left:16px;font-size:13px;font-weight:800;color:#fff;z-index:9999;text-shadow:0 2px 6px rgba(0,0,0,0.9)">v8.2</div>
+<div style="position:fixed;bottom:16px;left:16px;font-size:13px;font-weight:800;color:#fff;z-index:9999;text-shadow:0 2px 6px rgba(0,0,0,0.9)">v8.6</div>
 
 <script>
 // ===== DATA =====
@@ -1021,7 +1021,7 @@ function addTask() {
     const eMins = endTime ? timeToMins(endTime) : null;
     const startPast = sMins!==null && sMins < nowMins;
     const endPast = eMins!==null && eMins < nowMins;
-    const endBeforeStart = sMins!==null && eMins!==null && eMins <= sMins;
+    const endBeforeStart = false; // Allow cross-midnight tasks
 
     if(endBeforeStart) {
       showAlert('⚠️','请重新设置结束时间','qǐng chóng xīn shè zhì jié shù shí jiān<br>结束时间不能早于开始时间！<br><span style="font-size:13px;opacity:0.8">jié shù shí jiān bù néng zǎo yú kāi shǐ shí jiān</span>');
@@ -1240,7 +1240,6 @@ function lockParent(){parentUnlocked=false;closeModal('parentModal');}
 const _notifiedPre=new Set(), _notifiedEnd=new Set();
 function pollAlarms() {
   const now=Date.now();
-  // Only poll tasks that have been saved (createdAt exists) and not currently being added
   if(document.getElementById('addModal').classList.contains('open')) return;
   db.tasks.filter(t=>isToday(t.createdAt)&&!t.done).forEach(task=>{
     if(task.startTime) {
@@ -1267,26 +1266,52 @@ function pollAlarms() {
 
 function playAlertSound(type) {
   try {
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const ctx = new(window.AudioContext||window.webkitAudioContext)();
     if(type==='lively') {
-      // Upbeat arpeggio
-      [523,659,784,1047,784,1047].forEach((f,i)=>{
-        const o=ctx.createOscillator(),g=ctx.createGain();
-        o.connect(g);g.connect(ctx.destination);
-        o.frequency.value=f;o.type='square';
-        g.gain.setValueAtTime(0.15,ctx.currentTime+i*0.1);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.1+0.15);
-        o.start(ctx.currentTime+i*0.1);o.stop(ctx.currentTime+i*0.1+0.15);
+      // Fun playful melody ~4 seconds - like a little fanfare
+      const notes = [
+        {f:523,t:0,d:0.15},{f:659,t:0.18,d:0.15},{f:784,t:0.36,d:0.15},
+        {f:1047,t:0.54,d:0.25},{f:988,t:0.82,d:0.15},{f:1047,t:1.0,d:0.3},
+        {f:784,t:1.35,d:0.15},{f:880,t:1.53,d:0.15},{f:988,t:1.71,d:0.15},
+        {f:1047,t:1.9,d:0.5},
+        // Second phrase
+        {f:659,t:2.5,d:0.12},{f:784,t:2.65,d:0.12},{f:880,t:2.8,d:0.12},
+        {f:1047,t:2.95,d:0.12},{f:1175,t:3.1,d:0.12},{f:1319,t:3.25,d:0.6},
+      ];
+      notes.forEach(n=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=n.f; o.type='triangle';
+        g.gain.setValueAtTime(0,ctx.currentTime+n.t);
+        g.gain.linearRampToValueAtTime(0.22,ctx.currentTime+n.t+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+n.t+n.d);
+        o.start(ctx.currentTime+n.t);
+        o.stop(ctx.currentTime+n.t+n.d+0.05);
       });
-    } else {
-      // Soft two-tone
-      [440,523].forEach((f,i)=>{
+      // Add a little sparkle with high notes
+      [1319,1568,2093].forEach((f,i)=>{
         const o=ctx.createOscillator(),g=ctx.createGain();
         o.connect(g);g.connect(ctx.destination);
         o.frequency.value=f;o.type='sine';
-        g.gain.setValueAtTime(0.12,ctx.currentTime+i*0.4);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.4+0.6);
-        o.start(ctx.currentTime+i*0.4);o.stop(ctx.currentTime+i*0.4+0.7);
+        g.gain.setValueAtTime(0.08,ctx.currentTime+3.5+i*0.15);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+3.5+i*0.15+0.3);
+        o.start(ctx.currentTime+3.5+i*0.15);
+        o.stop(ctx.currentTime+3.5+i*0.15+0.35);
+      });
+    } else {
+      // Soft gentle reminder ~3 seconds
+      const softNotes = [
+        {f:440,t:0,d:0.6},{f:523,t:0.7,d:0.6},{f:494,t:1.4,d:0.6},{f:440,t:2.1,d:0.8}
+      ];
+      softNotes.forEach(n=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.frequency.value=n.f;o.type='sine';
+        g.gain.setValueAtTime(0,ctx.currentTime+n.t);
+        g.gain.linearRampToValueAtTime(0.12,ctx.currentTime+n.t+0.05);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+n.t+n.d);
+        o.start(ctx.currentTime+n.t);
+        o.stop(ctx.currentTime+n.t+n.d+0.05);
       });
     }
   } catch(e){}
@@ -1387,7 +1412,7 @@ function unlockBodyScroll() {
 // ===== INIT =====
 loadDB(); createStars(); renderTasks(); renderNotifBanner();
 db.tasks.filter(t=>t.running).forEach(t=>startInterval(t.id));
-setInterval(pollAlarms, 30000);
+setInterval(pollAlarms, 10000);
 pollAlarms(); // check immediately on load
 </script>
 
