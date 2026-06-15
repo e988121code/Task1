@@ -286,15 +286,15 @@ body {
     <div class="time-fields-grid">
       <div class="time-field-wrap">
         <div class="field-label" style="margin-bottom:4px">开始时间 / kāi shǐ shí jiān</div>
-        <input class="text-input" id="startTimeInput" type="time" oninput="computeThirdField()" style="font-size:20px;padding:12px 14px;">
+        <input class="text-input" id="startTimeInput" type="time" onchange="computeThirdField()" style="font-size:20px;padding:12px 14px;">
       </div>
       <div class="time-field-wrap">
         <div class="field-label" style="margin-bottom:4px">结束时间 / jié shù shí jiān</div>
-        <input class="text-input" id="endTimeInput" type="time" oninput="computeThirdField()" style="font-size:20px;padding:12px 14px;">
+        <input class="text-input" id="endTimeInput" type="time" onchange="computeThirdField()" style="font-size:20px;padding:12px 14px;">
       </div>
       <div class="time-field-wrap time-field-full">
         <div class="field-label" style="margin-bottom:4px">计划时长（分钟）/ jì huà shí cháng</div>
-        <input class="text-input" id="taskTimeInput" type="number" min="1" max="360" placeholder="例如 30" oninput="computeThirdField()">
+        <input class="text-input" id="taskTimeInput" type="number" min="1" max="360" placeholder="例如 30" onchange="computeThirdField()">
       </div>
     </div>
     <div class="time-computed" id="timeComputed" style="display:none"></div>
@@ -404,7 +404,7 @@ body {
 </div>
 
 <div class="toast-msg" id="toastMsg"></div>
-<div style="position:fixed;bottom:16px;left:16px;font-size:13px;font-weight:800;color:#fff;z-index:9999;text-shadow:0 2px 6px rgba(0,0,0,0.9)">v8.6</div>
+<div style="position:fixed;bottom:16px;left:16px;font-size:13px;font-weight:800;color:#fff;z-index:9999;text-shadow:0 2px 6px rgba(0,0,0,0.9)">v9.0</div>
 
 <script>
 // ===== DATA =====
@@ -586,8 +586,8 @@ function buildTaskCard(task) {
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;min-width:80px;margin-left:8px">
         <span style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);white-space:nowrap">实际用时</span>
-        <span style="font-size:13px;color:rgba(255,255,255,0.75);white-space:nowrap">shí jì yòng shí</span>
-        <span id="elapsed-${task.id}" style="font-size:24px;font-weight:900;color:#fff;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,0.95);margin-top:4px">${formatTime(elapsed)}</span>
+        <span style="font-size:18px;color:rgba(255,255,255,0.75);white-space:nowrap">shí jì yòng shí</span>
+        <span id="elapsed-${task.id}" style="font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,0.95);margin-top:4px">${formatTime(elapsed)}</span>
       </div>
     </div>
 
@@ -932,20 +932,19 @@ function parseVoiceInput(t) {
   if(dm) { document.getElementById('taskTimeInput').value=dm[1]; nameStr=nameStr.replace(dm[0],''); }
 
   function smartTime(mins) {
-    // mins from voice could be 0-719 (12h format)
     const now = new Date();
     const nowMins = now.getHours()*60 + now.getMinutes();
-    // If already in 24h range and > 12h, use as-is
     if(mins >= 720) return minsToTime(mins);
-    // Try AM (mins as-is) and PM (mins+720)
-    const amMins = mins;
+    const amMins = mins;      // e.g. 12:53 -> 773 mins (12h*60+53)
     const pmMins = mins + 720;
-    // Pick the closest future time
+    // Pick closest future time - prefer smallest positive difference
     const candidates = [amMins, pmMins].filter(c=>c>=0&&c<1440);
-    const future = candidates.filter(c => c > nowMins);
-    if(future.length > 0) return minsToTime(Math.min(...future));
-    // All past - return the pm version as default next occurrence
-    return minsToTime(pmMins < 1440 ? pmMins : amMins);
+    const withDiff = candidates.map(c=>({c, diff: c - nowMins}));
+    // Prefer future times, pick smallest positive diff
+    const future = withDiff.filter(x=>x.diff >= 0);
+    if(future.length > 0) return minsToTime(future.sort((a,b)=>a.diff-b.diff)[0].c);
+    // All past - pick least negative (most recent past = closest to now)
+    return minsToTime(withDiff.sort((a,b)=>b.diff-a.diff)[0].c);
   }
   if(startMins!==null) document.getElementById('startTimeInput').value = smartTime(startMins);
   if(endMins!==null)   document.getElementById('endTimeInput').value   = smartTime(endMins);
