@@ -45,7 +45,7 @@ body {
 .screen-time-pinyin { font-size: 14px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); color: var(--pinyin); letter-spacing: 1px; }
 .tasks-area { padding: 0 16px; display: flex; flex-direction: column; overflow-x: hidden; touch-action: pan-y; }
 .task-card {
-  background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.35);
+  background: rgba(0,0,0,0.38); border: 1.5px solid rgba(255,255,255,0.3);
   border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
   backdrop-filter: blur(12px); transition: transform 0.15s; position: relative; overflow: hidden;
 }
@@ -225,7 +225,7 @@ body {
       <div class="app-title">小猕猴桃脑袋星</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:24px;margin:6px 0 4px;width:100%;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7))"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
       <div class="app-pinyin">xiǎo mí hú táo nǎo dài xīng</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v3.4</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.8)">v3.5</div>
     </div>
     <div class="screen-time-badge" onclick="openParent()">
       <div class="screen-time-num" id="screenTimeNum">0</div>
@@ -307,7 +307,7 @@ body {
 </div>
 
 <!-- Parent Modal -->
-<div class="modal-backdrop" id="parentModal" onclick="closeModalIfBackdrop(event,'parentModal')">
+<div class="modal-backdrop" id="parentModal">
   <div class="parent-modal">
     <button class="close-btn" onclick="closeModal('parentModal')">×</button>
     <div class="modal-title">👨‍👩‍👦 家长中心</div>
@@ -392,7 +392,7 @@ body {
 
 
 <!-- Completed Tasks Modal -->
-<div class="modal-backdrop" id="doneModal" onclick="closeModalIfBackdrop(event,'doneModal')">
+<div class="modal-backdrop" id="doneModal">
   <div class="modal-sheet" style="max-height:80dvh">
     <button class="close-btn" onclick="closeModal('doneModal')">×</button>
     <div class="modal-title">已完成任务 ✓</div>
@@ -584,20 +584,19 @@ function buildTaskCard(task) {
       <div class="task-emoji">${task.emoji||'⭐'}</div>
       <div class="task-info">
         <div class="task-name">${task.name}</div>
-        ${pinyin?`<div class="task-pinyin">${pinyin}</div>`:''}
+        <div class="task-pinyin">${pinyin||'&nbsp;'}</div>
         ${timeTags?`<div class="task-time-tags">${timeTags}</div>`:''}
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px">实际用时 <span id="elapsed-${task.id}">${formatTime(elapsed)}</span></div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px">实际用时 <span style="font-size:11px;opacity:0.7">shí jì yòng shí</span> <span id="elapsed-${task.id}">${formatTime(elapsed)}</span></div>
       </div>
     </div>
     ${task.running?`<div class="timer-display" id="timer-${task.id}">${formatTime(elapsed)}</div>`:''}
     ${!task.done?`
     <div class="task-actions">
-      ${!task.running&&!task.started?`<button class="btn-task btn-start" onclick="startTask('${task.id}')"><span>▶ 开始</span><span class="btn-pinyin">kāi shǐ</span></button>`:''}
+      ${!task.running?`<button class="btn-task btn-start" onclick="startTask('${task.id}')"><span>${task.started?'▶ 继续':'▶ 开始'}</span><span class="btn-pinyin">${task.started?'jì xù':'kāi shǐ'}</span></button>`:''}
       ${task.running?`<button class="btn-task btn-pause" onclick="pauseTask('${task.id}')"><span>⏸ 暂停</span><span class="btn-pinyin">zàn tíng</span></button>`:''}
-      ${task.started&&!task.running?`<button class="btn-task btn-start" onclick="startTask('${task.id}')"><span>▶ 继续</span><span class="btn-pinyin">jì xù</span></button>`:''}
       ${task.started?`<button class="btn-task btn-done" onclick="doneTask('${task.id}')"><span>✓ 完成</span><span class="btn-pinyin">wán chéng</span></button>`:''}
       ${!task.started?`<button class="btn-task btn-pause" onclick="editTask('${task.id}')"><span>✏️ 修改</span><span class="btn-pinyin">xiū gǎi</span></button>`:''}
-      <button class="btn-task btn-delete" onclick="deleteTask('${task.id}')">🗑</button>
+      <button class="btn-task btn-delete" onclick="deleteTask('${task.id}')"><span>🗑 删除</span><span class="btn-pinyin">shān chú</span></button>
     </div>`:`<div style="margin-top:10px;font-size:13px;color:rgba(255,255,255,0.4)">✓ 已完成 · 用时 ${formatTime(elapsed)}</div>`}
     ${task.running&&estMins>0?`<div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-${task.id}" style="width:${progress}%"></div></div>`:''}
   `;
@@ -1254,7 +1253,7 @@ function pollAlarms() {
         playAlertSound('lively');
       }
     }
-    if(task.endTime) {
+    if(task.endTime && task.started) {
       const endMs=timeStrToTodayMs(task.endTime);
       const preEndMs=endMs-5*60*1000;
       if(now>=preEndMs&&now<endMs&&!_notifiedEnd.has(task.id)) {
